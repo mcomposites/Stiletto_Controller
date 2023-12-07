@@ -1,0 +1,3 @@
+paho-mqtt==1.5.1
+kivy==2.2.1
+mosquito==2.0.11
