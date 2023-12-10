@@ -3,9 +3,8 @@ import threading
 import time
 
 class SystemMonitor:
-    def __init__(self, mqtt_client, wifi_manager, gui):
+    def __init__(self, mqtt_client, gui):
         self.mqtt_client = mqtt_client
-        self.wifi_manager = wifi_manager
         self.gui = gui
         self.monitoring_active = False
 
