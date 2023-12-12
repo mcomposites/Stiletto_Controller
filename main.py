@@ -2,28 +2,45 @@
 import time
 from kivy.app import App
 from signal_k_client import SignalKClient
+f
+from kivy.app import App
+from gui import MyApp
+from gui import MainScreen, AdvancedSettingsScreen, MyScreenManager
+from signal_k_client import SignalKClient
 from light_controller import LightController
-from gui import GUI
 from system_monitor import SystemMonitor
 
-class MyApp(App):
+# Define the main application class
+class StilettoApp(App):
     def build(self):
         # Initialize the SignalK Client
-        mqtt_client = SignalKClient("http://your-signalk-server:port")
+        signal_k_client = SignalKClient("http://your-signalk-server:port")
 
-        # Initialize the light controller
-        light_controller = LightController(mqtt_client)
+        # Initialize the light controller with the SignalK client
+        light_controller = LightController(signal_k_client)
+        
+        # Initialize the ScreenManager
+        screen_manager = MyScreenManager()
 
-        # Initialize the GUI
-        gui = GUI(light_controller)
+        # Create instances of your screens
+        main_screen = MainScreen(name='main')
+        advanced_settings_screen = AdvancedSettingsScreen(name='advanced_settings')
 
-        # Initialize the system monitor
-        system_monitor = SystemMonitor(mqtt_client, wifi_manager, gui)
+        # Add screens to the ScreenManager
+        screen_manager.add_widget(main_screen)
+        screen_manager.add_widget(advanced_settings_screen)
 
-        # Start the system monitor
+        # Initialize the system monitor with the SignalK client and the app interface
+        system_monitor = SystemMonitor(signal_k_client, self)
+
+        # Start the system monitor (you might need to handle threading or async calls)
         system_monitor.start()
 
-        return gui
+        # Return the main application interface
 
-if __name__ == "__main__":
-    MyApp().run()
+        return screen_manager
+
+# Run the application
+if __name__ == '__main__':
+    StilettoApp().run()
+
