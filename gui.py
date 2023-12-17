@@ -56,11 +56,11 @@ class LightsControlScreen(Screen):
         main_layout = BoxLayout(orientation='vertical')
 
         # Grid layout for light controls
-        grid_layout = GridLayout(cols=3, spacing=10)
+        grid_layout = GridLayout(cols=3, spacing=(10, 10))
         for light_id in light_names:
             label = Label(text=light_id)
-            switch = Switch(active=False)
-            slider = Slider(min=0, max=100, value=50)
+            switch = Switch(active=False, size_hint_y=None, height=60)
+            slider = Slider(min=0, max=100, value=50, size_hint_y=None, height=60)
 
             # Set light_id as an attribute on the switch
             setattr(switch, 'light_id', light_id)
@@ -131,18 +131,44 @@ class PowerToAccessoriesScreen(Screen):
             self.light_controller.turn_off_accessory(accessory_id)
 # Advanced Settings Screen
 class AdvancedSettingsScreen(Screen):
-    def __init__(self, **kwargs):
+    def __init__(self, signal_k_client, **kwargs):
         super(AdvancedSettingsScreen, self).__init__(**kwargs)
+        self.signal_k_client = signal_k_client  # SignalKClient instance
+
         layout = BoxLayout(orientation='vertical')
+
+        # Log for displaying messages
         self.log = TextInput(text='Log messages here...', readonly=True, multiline=True, size_hint=(1, 0.8))
         layout.add_widget(self.log)
+
+        # Button for requesting Signal K access
+        request_access_button = Button(text='Request Signal K Access', size_hint=(1, 0.1))
+        request_access_button.bind(on_press=self.request_access)
+        layout.add_widget(request_access_button)
+
+        # Back button
         back_button = Button(text='Back to Main Screen', size_hint=(1, 0.1))
         back_button.bind(on_press=self.go_to_main)
         layout.add_widget(back_button)
+
         self.add_widget(layout)
 
     def go_to_main(self, instance):
         self.manager.current = 'main'
+
+    def request_access(self, instance):
+        # Update the log with the access request status
+        self.log.text = 'Requesting Signal K access...'
+        
+        # Logic to initiate the access request
+        description = "Advanced Settings Access Request"
+        access_response = self.signal_k_client.request_access(description)
+
+        if access_response:
+            # Append response to the log
+            self.log.text += f'\nAccess response: {access_response}'
+        else:
+            self.log.text += '\nError initiating access request.'
 
 # Screen Manager
 class MyScreenManager(ScreenManager):
